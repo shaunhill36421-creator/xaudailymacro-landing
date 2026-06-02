@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XAU Daily Macro Pro — Multi-Timeframe Analysis Bot | PF 1.37 Backtest</title>
+<meta name="description" content="On-demand XAU/Forex/Crypto multi-timeframe + macro analysis bot. 12-month backtest PF 1.37. Honest data, no inflated stats. $39 for 30-day Pro access.">
+<meta property="og:title" content="XAU Daily Macro Pro — Multi-TF Analysis Bot">
+<meta property="og:description" content="Daily XAU/Forex multi-TF + macro context. Backtest PF 1.37. Honest data. $39 30-day Pro.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-card: #161616;
+    --text: #f5f5f5;
+    --text-muted: #999;
+    --gold: #D4AF37;
+    --gold-dim: #c19a2e;
+    --green: #4ade80;
+    --red: #f87171;
+    --border: #2a2a2a;
+    --max-w: 980px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+  .container { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+  /* HERO */
+  .hero {
+    padding: 80px 0 64px;
+    background: radial-gradient(ellipse at top, rgba(212, 175, 55, 0.08), transparent 60%);
+    text-align: center;
+  }
+  .hero .badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: rgba(212, 175, 55, 0.12);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 999px;
+    color: var(--gold);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+  }
+  .hero h1 .accent { color: var(--gold); }
+  .hero .sub {
+    font-size: clamp(15px, 2vw, 18px);
+    color: var(--text-muted);
+    max-width: 720px;
+    margin: 0 auto 36px;
+  }
+  .cta-row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+  .cta-btn {
+    display: inline-block;
+    padding: 18px 40px;
+    background: linear-gradient(180deg, var(--gold), var(--gold-dim));
+    color: #000;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 8px 32px rgba(212, 175, 55, 0.2);
+  }
+  .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(212, 175, 55, 0.35);
+  }
+  .cta-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .trust-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px 28px;
+    margin-top: 28px;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+  .trust-row .item::before {
+    content: "✓ ";
+    color: var(--green);
+    font-weight: bold;
+    margin-right: 4px;
+  }
+
+  /* STATS */
+  .stats {
+    padding: 56px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-card);
+  }
+  .stats h2 {
+    text-align: center;
+    font-size: clamp(22px, 3vw, 28px);
+    margin-bottom: 8px;
+  }
+  .stats .sub {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .stat-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 16px;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--gold);
+    margin-bottom: 6px;
+    letter-spacing: -0.02em;
+  }
+  .stat-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .stats-footnote {
+    max-width: 680px;
+    margin: 32px auto 0;
+    padding: 20px 24px;
+    background: rgba(247, 113, 113, 0.06);
+    border-left: 3px solid var(--red);
+    border-radius: 6px;
+    font-size: 14px;
+    color: #ddd;
+  }
+  .stats-footnote strong { color: var(--red); }
+
+  /* SECTIONS */
+  section.block {
+    padding: 72px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  section.block h2 {
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 700;
+    margin-bottom: 24px;
+    text-align: center;
+    letter-spacing: -0.01em;
+  }
+  section.block h2.left { text-align: left; }
+  section.block .lead {
+    font-size: 16px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    max-width: 720px;
+  }
+  .body-p { margin-bottom: 16px; font-size: 16px; color: #ccc; }
+  .body-p strong { color: var(--text); }
+
+  /* PROBLEM */
+  .problem {
+    background: var(--bg-card);
+  }
+  .problem .lead-center {
+    font-size: clamp(18px, 2.2vw, 22px);
+    font-weight: 600;
+    text-align: center;
+    color: var(--text);
+    margin: 32px 0;
+    padding: 24px;
+    border-left: 3px solid var(--gold);
+    background: rgba(212, 175, 55, 0.04);
+    border-radius: 6px;
+  }
+
+  /* PRODUCT LIST */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 32px;
+  }
+  .product-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 24px;
+  }
+  .product-item .emoji {
+    font-size: 32px;
+    margin-bottom: 12px;
+  }
+  .product-item h3 {
+    font-size: 18px;
+    margin-bottom: 8px;
+    color: var(--gold);
+  }
+  .product-item p {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* DIFFERENTIATOR */
+  .diff-list {
+    counter-reset: diff;
+    display: grid;
+    gap: 16px;
+  }
+  .diff-item {
+    counter-increment: diff;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px 28px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .diff-item::before {
+    content: counter(diff, decimal-leading-zero);
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--gold);
+    line-height: 1;
+    flex-shrink: 0;
+    min-width: 36px;
+  }
+  .diff-item h3 {
+    font-size: 17px;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+  .diff-item p {
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  /* INCLUDED */
+  .included-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-top: 32px;
+  }
+  @media (max-width: 640px) {
+    .included-grid { grid-template-columns: 1fr; }
+  }
+  .included-col h3 {
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+  .included-col h3.yes { color: var(--green); }
+  .included-col h3.no { color: var(--red); }
+  .included-col ul {
+    list-style: none;
+  }
+  .included-col li {
+    padding: 10px 0;
+    font-size: 15px;
+    color: #ccc;
+    border-bottom: 1px solid var(--border);
+  }
+  .included-col li:last-child { border-bottom: none; }
+  .included-col.yes li::before { content: "✓"; color: var(--green); margin-right: 10px; font-weight: bold; }
+  .included-col.no li::before { content: "✗"; color: var(--red); margin-right: 10px; font-weight: bold; }
+
+  /* PRICE BOX */
+  .price-box {
+    max-width: 480px;
+    margin: 32px auto 0;
+    background: linear-gradient(180deg, var(--bg-card), #0e0e0e);
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 36px 32px;
+    text-align: center;
+    box-shadow: 0 16px 64px rgba(212, 175, 55, 0.1);
+  }
+  .price-box h3 {
+    font-size: 20px;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+  .price-box .sub {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+  .price-box .amount {
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--gold);
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+  .price-box .amount-meta {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+  }
+  .price-box ul {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 28px;
+  }
+  .price-box li {
+    padding: 8px 0;
+    font-size: 15px;
+    color: #ddd;
+  }
+  .price-box li::before { content: "✓ "; color: var(--green); font-weight: bold; }
+  .price-box .guarantee {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 16px;
+  }
+  .renewal-note {
+    max-width: 640px;
+    margin: 32px auto 0;
+    padding: 20px 24px;
+    background: rgba(74, 222, 128, 0.04);
+    border-left: 3px solid var(--green);
+    border-radius: 6px;
+    font-size: 14px;
+    color: #ddd;
+  }
+
+  /* FAQ */
+  details {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  details:hover {
+    background: #1c1c1c;
+  }
+  summary {
+    font-weight: 600;
+    font-size: 16px;
+    list-style: none;
+    color: var(--text);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::after {
+    content: "+";
+    font-size: 24px;
+    color: var(--gold);
+    font-weight: 300;
+    transition: transform 0.2s;
+  }
+  details[open] summary::after { content: "−"; }
+  details p {
+    margin-top: 14px;
+    color: var(--text-muted);
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 48px 0;
+    background: #050505;
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+  footer .links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 18px 28px;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+  footer .links a {
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  footer .links a:hover { color: var(--gold); }
+  footer .disclaimer {
+    font-size: 12px;
+    color: #666;
+    max-width: 720px;
+    margin: 0 auto 16px;
+    line-height: 1.7;
+  }
+  footer .copy {
+    font-size: 12px;
+    color: #555;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    .hero { padding: 56px 0 48px; }
+    section.block { padding: 56px 0; }
+    .diff-item { padding: 20px; flex-direction: column; }
+    .stat-box { padding: 20px 12px; }
+    .stat-value { font-size: 30px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <span class="badge">XAU Daily Macro · Pro Access</span>
+    <h1>
+      The Multi-Timeframe Gold Analysis System That Backtested
+      <span class="accent">PF 1.37 on XAU</span>
+      — Without a Single "Guru" Promise
+    </h1>
+    <p class="sub">
+      Get instant daily bias, key levels, and macro context (DXY + US 10Y)
+      on 45+ symbols. Built by a data engineer who refused to fake winrates.
+    </p>
+    <div class="cta-row">
+      <a href="#pricing" class="cta-btn">Get 30-Day Pro Access — $39</a>
+      <div class="cta-meta">One-time payment. Pure deliverable. No upsells.</div>
+    </div>
+    <div class="trust-row">
+      <div class="item">12-month verified backtest report (PDF included)</div>
+      <div class="item">245 trades documented — wins AND losses</div>
+      <div class="item">Multi-TF + DXY + US10Y confluence engine</div>
+      <div class="item">30-day refund if you don't get value</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="container">
+    <h2>The Numbers (Honest)</h2>
+    <p class="sub">12-month XAU backtest · 245 trades · H4 entries with D1 confluence</p>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <div class="stat-value">1.37</div>
+        <div class="stat-label">Profit Factor</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">40.4%</div>
+        <div class="stat-label">Win Rate</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">+53.6R</div>
+        <div class="stat-label">Total Return</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value">19R</div>
+        <div class="stat-label">Max Drawdown</div>
+      </div>
+    </div>
+    <div class="stats-footnote">
+      <strong>Honesty disclosure:</strong> Same strategy on EURUSD and USDJPY backtests at PF &lt; 1.0 (LOSING). Strategy works on XAU because gold has stronger directional bias from macro forces (DXY/yields). It will NOT print profits on every pair. You'll get the full 12-month backtest PDF with every trade documented — wins AND losses.
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="block problem">
+  <div class="container">
+    <h2>You've Been Sold Trading Signals That Lie</h2>
+    <p class="body-p">Look — we both know the truth.</p>
+    <p class="body-p">The "$10K/month Forex Robot" guy on TikTok doesn't trade his own signals. The Telegram group with "85% winrate" never publishes losing trades. The PDF course charging $497 just teaches you what's on YouTube for free.</p>
+    <p class="body-p">Most "trading systems" sold online have one thing in common:</p>
+    <p class="lead-center">The owner never published their full equity curve.<br>Because if they did, you'd see the gaps — the losing streaks, the drawdowns, the months where the strategy stopped working.</p>
+    <p class="body-p">You don't need more lies. You need a tool that gives you:</p>
+    <p class="body-p"><strong>The same analysis professional desks build in 5 minutes</strong> — cross-checked across 4 timeframes (M15, H1, H4, D1), with macro context (DXY direction, 10Y yields), and the actual backtest with every trade documented.</p>
+    <p class="body-p" style="text-align: center; margin-top: 32px; color: var(--gold); font-weight: 600;">That's what this is.</p>
+  </div>
+</section>
+
+<!-- PRODUCT DEMO -->
+<section class="block">
+  <div class="container">
+    <h2>Here's What You Get When You Buy</h2>
+    <div class="product-grid">
+      <div class="product-item">
+        <div class="emoji">🤖</div>
+        <h3>Telegram Bot — On-Demand Multi-TF Analysis</h3>
+        <p>Type <code>/analyze XAUUSD</code> in Telegram → bias, score, levels, macro context in 5 seconds. 45+ symbols: XAU, EUR/USD, BTC, ETH, US500, WTI, and more.</p>
+      </div>
+      <div class="product-item">
+        <div class="emoji">📊</div>
+        <h3>12-Month Backtest Report PDF</h3>
+        <p>Every trade. Every loss. Every gain. No survivorship bias. Methodology revealed in full — strategy is reproducible.</p>
+      </div>
+      <div class="product-item">
+        <div class="emoji">📈</div>
+        <h3>Daily Public Channel Access</h3>
+        <p>Pre-London open analysis every 4 hours. See the bot's calls before market opens. Free forever.</p>
+      </div>
+      <div class="product-item">
+        <div class="emoji">🎯</div>
+        <h3>30-Day Pro Tier (Unlimited)</h3>
+        <p>Unlimited analyses, any symbol, any timeframe. No daily limits, no symbol restrictions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFFERENTIATORS -->
+<section class="block">
+  <div class="container">
+    <h2>Why This Is Different</h2>
+    <div class="diff-list">
+      <div class="diff-item">
+        <div>
+          <h3>Built by a data engineer, not a "guru"</h3>
+          <p>Stack: Python + Twelve Data API + Supabase + matplotlib. You'll see the code structure in the PDF appendix. No hidden "secret indicator" — just honest multi-TF confluence.</p>
+        </div>
+      </div>
+      <div class="diff-item">
+        <div>
+          <h3>The backtest is published in the product itself</h3>
+          <p>Most courses won't show their backtest. This bot includes the PDF. You can verify the methodology before subscribing further.</p>
+        </div>
+      </div>
+      <div class="diff-item">
+        <div>
+          <h3>Multi-timeframe + Macro is rare in retail tools</h3>
+          <p>Most analysis tools look at ONE timeframe. We score D1 + H4 together, then layer DXY (USD strength) and US10Y (yield direction) on top. That's how pros think.</p>
+        </div>
+      </div>
+      <div class="diff-item">
+        <div>
+          <h3>30-day refund — no questions</h3>
+          <p>If the bot doesn't give you value in 30 days, request refund on WP/JVZoo. We honor every legitimate request because we want customers who actually use the tool.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INCLUDED -->
+<section class="block">
+  <div class="container">
+    <h2>What's Included (and What's Not)</h2>
+    <div class="included-grid">
+      <div class="included-col yes">
+        <h3 class="yes">INCLUDED</h3>
+        <ul>
+          <li>Telegram Bot 30-Day Pro Access (Unlimited)</li>
+          <li>12-Month XAU Backtest Report (PDF, 7 sections)</li>
+          <li>45+ symbols (XAU/Forex/Crypto/Indices/Oil)</li>
+          <li>Multi-timeframe scoring (M15/H1/H4/D1)</li>
+          <li>Macro context (DXY + US10Y + News)</li>
+          <li>Public Telegram channel (4-hour auto-posts)</li>
+          <li>Email support during 30-day access</li>
+        </ul>
+      </div>
+      <div class="included-col no">
+        <h3 class="no">NOT INCLUDED (no fake bonuses)</h3>
+        <ul>
+          <li>"Secret indicator" with no math</li>
+          <li>Promise of guaranteed profits</li>
+          <li>Affiliate scheme to recruit your friends</li>
+          <li>Done-for-you guru calls</li>
+          <li>"Limited time" countdown timers</li>
+          <li>Upsell after upsell after upsell</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="block" id="pricing">
+  <div class="container">
+    <h2>30-Day Pro Access for $39 — One Time</h2>
+    <div class="price-box">
+      <h3>XAU Daily Macro Pro</h3>
+      <div class="sub">30-Day Full Access</div>
+      <div class="amount">$39</div>
+      <div class="amount-meta">One-time payment · No auto-renewal</div>
+      <ul>
+        <li>Unlimited analyses (45+ symbols)</li>
+        <li>12-Month Backtest PDF (yours forever)</li>
+        <li>Public TG channel access</li>
+        <li>Email support during trial</li>
+        <li>30-day money-back guarantee</li>
+      </ul>
+      <a href="#" class="cta-btn" id="buy-btn" style="display:block; width:100%;">Buy Now — $39</a>
+      <div class="guarantee">30-day money-back guarantee · No hidden fees</div>
+    </div>
+    <div class="renewal-note">
+      <strong>After Day 30:</strong> Your Pro access expires. You can either (A) re-purchase here for another 30 days at $39, OR (B) subscribe directly on the bot for $9/mo (Lite), $19/mo (Trader), or $300/yr Annual (save 36%). We'll email you on Day 25 with both options. <strong>No auto-renewal here</strong> — you decide.
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="block">
+  <div class="container">
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+      <summary>I don't know coding. Can I use this?</summary>
+      <p>No coding needed. You just type <code>/analyze XAUUSD</code> in Telegram and get analysis. Like ChatGPT, but for trading bias.</p>
+    </details>
+
+    <details>
+      <summary>How is this different from other forex bots?</summary>
+      <p>Most retail bots score ONE timeframe and don't include macro context. This scores 4 timeframes (M15/H1/H4/D1) AND tracks DXY + US10Y. That's how institutional desks analyze.</p>
+    </details>
+
+    <details>
+      <summary>Will this make me money?</summary>
+      <p>Honestly: no tool guarantees profit. The backtest showed PF 1.37 on XAU over 12 months, but past performance doesn't guarantee future results. Use this as a decision-support tool, not a "buy/sell button."</p>
+    </details>
+
+    <details>
+      <summary>Why is this $39 if other tools charge $97/mo?</summary>
+      <p>Because we'd rather have 1,000 happy customers at fair pricing than 50 at gouging prices. Long-term reputation &gt; short-term margin.</p>
+    </details>
+
+    <details>
+      <summary>Refund policy?</summary>
+      <p>30-day money-back via WP/JVZoo refund process. We honor every legitimate request.</p>
+    </details>
+
+    <details>
+      <summary>What if I want to subscribe long-term?</summary>
+      <p>On Day 25 we'll email you the bot's direct subscription page ($9/mo Lite, $19/mo Trader, $39/mo Pro, $300/yr Annual save 36%). Cheaper than rebuying on marketplace.</p>
+    </details>
+
+    <details>
+      <summary>Do you publish your losses publicly?</summary>
+      <p>Yes. Every backtest trade — wins AND losses — is in the PDF. We also tweet thesis updates daily on @XAUDailyMacro. Profile pinned with backtest stats.</p>
+    </details>
+
+    <details>
+      <summary>Can I share my access with a friend?</summary>
+      <p>Telegram bot is tied to your account. Each subscription = one user. But your backtest PDF you can share freely.</p>
+    </details>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="links">
+      <a href="https://t.me/cryptoforexdailymacro" target="_blank">Free Telegram Channel (EN)</a>
+      <a href="https://t.me/cryptoforexvn" target="_blank">Free Telegram Channel (VN)</a>
+      <a href="https://x.com/XAUDailyMacro" target="_blank">Twitter / X</a>
+      <a href="https://bsky.app/profile/xaudailymacro.bsky.social" target="_blank">Bluesky</a>
+      <a href="https://youtube.com/@xaudailymacro" target="_blank">YouTube</a>
+    </div>
+    <p class="disclaimer">
+      Trading foreign exchange and gold carries substantial risk of loss. Past performance does not guarantee future results. The information provided by this tool is for educational purposes only and does not constitute financial advice. Always conduct your own research and consult a licensed financial advisor before trading. Refund policy: 30 days, no questions asked, via marketplace support.
+    </p>
+    <p class="copy">© 2026 XAU Daily Macro · All rights reserved</p>
+  </div>
+</footer>
+
+</body>
+</html>
